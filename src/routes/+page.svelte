@@ -19,6 +19,7 @@
 
   <div class="flex mb-2">
     <input
+      data-testid="url"
       type="text"
       value={url}
       readonly
