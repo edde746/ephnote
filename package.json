@@ -34,7 +34,10 @@
 		"@paralleldrive/cuid2": "^2.2.1",
 		"@steeze-ui/lucide-icons": "^1.1.1",
 		"@steeze-ui/svelte-icon": "^1.5.0",
+		"@tailwindcss/typography": "^0.5.9",
+		"@types/markdown-it": "^12.2.3",
 		"crypto-js": "^4.1.1",
-		"ioredis": "^5.3.2"
+		"ioredis": "^5.3.2",
+		"markdown-it": "^13.0.1"
 	}
 }
