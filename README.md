@@ -1,6 +1,6 @@
 # ephnote
 
-An end-to-end encrypted note sharing app with support for JavaScript-free environments. Built with SvelteKit, Redis and TailwindCSS.
+An end-to-end encrypted note sharing app with support for markdown and JavaScript-free environments. Built with SvelteKit, Redis and TailwindCSS.
 
 ## Features
 
@@ -9,6 +9,10 @@ An end-to-end encrypted note sharing app with support for JavaScript-free enviro
 - No JavaScript required\*
 
 \*Not true end-to-end encryption without JavaScript
+
+## Live Demo
+
+[ephnote.vercel.app](https://ephnote.vercel.app/)
 
 ## Deploying for Free
 
