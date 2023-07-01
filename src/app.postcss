@@ -11,9 +11,13 @@
     @apply dark:bg-neutral-950 bg-neutral-50 dark:text-neutral-50;
   }
 
+  .border-colors {
+    @apply dark:border-neutral-600 focus:dark:border-neutral-500 border-neutral-700 focus:border-neutral-800;
+  }
+
   .input {
     @apply bg-transparent rounded-lg focus:outline-none px-4 py-2 transition;
-    @apply border dark:border-neutral-600 focus:dark:border-neutral-500 border-neutral-700 focus:border-neutral-800;
+    @apply border border-colors;
     @apply placeholder:text-neutral-700 dark:placeholder-neutral-600;
   }
 
