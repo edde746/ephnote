@@ -33,6 +33,8 @@ test('note creation and reading', async ({ page }) => {
   // read the note
   await page.goto(url);
 
+  await page.getByRole('link', { name: 'Click here to read it.' }).click();
+
   await expect(page.getByRole('heading', { name: 'hello world' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'kitten' })).toBeVisible();
 });

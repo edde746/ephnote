@@ -1,38 +1,29 @@
-# create-svelte
+# ephnote
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+An end-to-end encrypted note sharing app with support for JavaScript-free environments. Built with SvelteKit, Redis and TailwindCSS.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Modern UI
+- End-to-end encryption
+- No JavaScript required\*
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+\*Not true end-to-end encryption without JavaScript
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Deploying for Free
 
-## Developing
+### Redis
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+There are many providers that offer free Redis instances, here are some of them:
 
-```bash
-npm run dev
+- [Redis Cloud](https://redis.com/try-free/)
+- [Upstash](https://upstash.com/)
+- [Aiven](https://aiven.io/)
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+### Hosting
 
-## Building
+For hosting, some viable options are [Vercel](https://vercel.com/) and [Cloudflare Pages](https://pages.cloudflare.com/).
 
-To create a production version of your app:
+### Environment Variables
 
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+The only environment variable required is `REDIS_URL`, which should be set to the connection string of your Redis instance.
