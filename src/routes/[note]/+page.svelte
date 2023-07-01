@@ -8,13 +8,29 @@
   export let data: PageData;
   export let form: ActionData;
 
-  let decrypted =
+  $: decrypted =
     data?.content && crypto.AES.decrypt(data.content, $page.url.hash.slice(1)).toString(crypto.enc.Utf8);
 </script>
 
-<hr class="mb-4 mt-1 dark:border-neutral-500" />
+<svelte:head>
+  <title>Read note - ephnote</title>
+  <meta
+    name="description"
+    content="Someone sent you an end-to-end encrypted note with ephnote. Open the link to view the note."
+  />
+</svelte:head>
 
-{#if form?.decrypted || decrypted}
+{#if data.destroyAfterRead && !$page.url.searchParams.has('read')}
+  <p>
+    The note will be destroyed after you read it.
+    <a
+      href="?read=true{$page.url.hash}"
+      class="text-lime-700 dark:text-lime-500 hover:text-lime-600 underline">Click here to read it.</a
+    >
+  </p>
+{:else if form?.decrypted || decrypted}
+  <hr class="mb-4 mt-1 dark:border-neutral-500" />
+
   <div class="prose prose-neutral max-w-none dark:prose-invert prose-sm">
     {@html md.render(form?.decrypted || decrypted || '')}
   </div>

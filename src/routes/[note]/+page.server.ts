@@ -20,7 +20,10 @@ export const load: PageServerLoad = async ({ params, url, request }) => {
 
   if (!note) throw error(404, 'Note not found');
 
-  if (note.destroyAfterRead) await redis.del(`note:${params.note}`);
+  if (note.destroyAfterRead) {
+    if (url.searchParams.has('read')) await redis.del(`note:${params.note}`);
+    else return { destroyAfterRead: true };
+  }
   return { ...note };
 };
 
