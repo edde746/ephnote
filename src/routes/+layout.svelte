@@ -5,6 +5,11 @@
   import { Github } from '@steeze-ui/lucide-icons';
 </script>
 
+<svelte:head>
+  <meta name="keywords" content="ephnote, e2ee, note, sharing, end-to-end, encrypted, open source, free" />
+  <meta property="language" content="en" />
+</svelte:head>
+
 <div class="contain">
   <div class="flex justify-between items-center mb-4">
     <a href="/">

@@ -13,6 +13,14 @@
   export let form: ActionData;
 </script>
 
+<svelte:head>
+  <title>ephnote - e2ee note sharing</title>
+  <meta
+    name="description"
+    content="Easily share end-to-end encrypted notes with others, no account required. Open source and free."
+  />
+</svelte:head>
+
 {#if form?.id}
   {@const url = `${$page.url.origin}/${form.id}#${form.key || encryptionKey}`}
   <p class="mb-2">Your note has been created. Share the link below with the recipient.</p>
@@ -57,7 +65,7 @@
     }}
   >
     <noscript>
-      <span class="text-xs text-yellow-500 mb-4 block">
+      <span class="text-xs text-lime-700 dark:text-lime-500 mb-4 block">
         You can still share this note, but it will be encrypted on the server instead of in your browser.
       </span>
     </noscript>
