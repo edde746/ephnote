@@ -28,6 +28,9 @@
       class="text-lime-700 dark:text-lime-500 hover:text-lime-600 underline">Click here to read it.</a
     >
   </p>
+  <noscript>
+    <p>Please copy the URL now as you will need it to decrypt the note.</p>
+  </noscript>
 {:else if form?.decrypted || decrypted}
   <hr class="mb-4 mt-1 dark:border-neutral-500" />
 
