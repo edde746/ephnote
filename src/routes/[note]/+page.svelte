@@ -20,6 +20,12 @@
   />
 </svelte:head>
 
+{#if form?.message}
+  <p class="text-red-600 dark:text-red-500 mb-4">
+    {form.message}
+  </p>
+{/if}
+
 {#if data.destroyAfterRead && !$page.url.searchParams.has('read')}
   <p>
     The note will be destroyed after you read it.
