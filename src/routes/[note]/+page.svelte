@@ -40,7 +40,7 @@
 {:else if form?.decrypted || decrypted}
   <hr class="mb-4 mt-1 dark:border-neutral-500" />
 
-  <div class="prose prose-neutral max-w-none dark:prose-invert prose-sm">
+  <div class="prose prose-neutral max-w-none dark:prose-invert">
     {@html md.render(form?.decrypted || decrypted || '')}
   </div>
 {:else}
