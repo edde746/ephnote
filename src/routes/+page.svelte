@@ -89,6 +89,8 @@
       class="w-full input mb-2"
       placeholder="Write your message here (with markdown support)..."
       maxlength={data.maxContentLength - 1}
+      minlength={1}
+      required
     />
     <div class="flex flex-wrap md:justify-between items-center gap-2">
       <label>
