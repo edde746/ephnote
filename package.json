@@ -16,7 +16,7 @@
 		"@playwright/test": "^1.47.0",
 		"@sveltejs/adapter-auto": "^3.2.4",
 		"@sveltejs/kit": "^2.5.26",
-		"@types/crypto-js": "^4.2.2",
+		"@types/markdown-it": "^14.1.2",
 		"autoprefixer": "^10.4.20",
 		"postcss": "^8.4.45",
 		"postcss-load-config": "^6.0.1",
@@ -31,13 +31,13 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@msgpack/msgpack": "3.0.0-beta2",
 		"@paralleldrive/cuid2": "^2.2.2",
 		"@steeze-ui/lucide-icons": "^1.3.0",
 		"@steeze-ui/svelte-icon": "^1.5.0",
 		"@sveltejs/vite-plugin-svelte": "^3.1.2",
 		"@tailwindcss/typography": "^0.5.15",
-		"@types/markdown-it": "^14.1.2",
-		"crypto-js": "^4.2.0",
+		"buffer": "^6.0.3",
 		"ioredis": "^5.4.1",
 		"markdown-it": "^14.1.0"
 	}

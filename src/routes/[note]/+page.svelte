@@ -1,15 +1,13 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { decryptNote } from '$lib';
   import type { ActionData, PageData } from './$types';
-  import crypto from 'crypto-js';
   import MarkdownIt from 'markdown-it';
+  import { browser } from '$app/environment';
   const md = new MarkdownIt();
 
   export let data: PageData;
   export let form: ActionData;
-
-  $: decrypted =
-    data?.content && crypto.AES.decrypt(data.content, $page.url.hash.slice(1)).toString(crypto.enc.Utf8);
 </script>
 
 <svelte:head>
@@ -20,38 +18,41 @@
   />
 </svelte:head>
 
-{#if form?.message}
-  <p class="text-red-600 dark:text-red-500 mb-4">
-    {form.message}
-  </p>
-{/if}
-
-{#if data.destroyAfterRead && !$page.url.searchParams.has('read')}
+{#if data.destroyAfterRead && !$page.url.searchParams.has('read') && browser}
   <p>
     The note will be destroyed after you read it.
     <a
+      data-sveltekit-preload-data="false"
       href="?read=true{$page.url.hash}"
-      class="text-lime-700 dark:text-lime-500 hover:text-lime-600 underline">Click here to read it.</a
+      class="text-lime-700 dark:text-lime-500 hover:text-lime-600 underline"
     >
+      Click here to read it.
+    </a>
   </p>
-  <noscript>
-    <p>Please copy the URL now as you will need it to decrypt the note.</p>
-  </noscript>
-{:else if form?.decrypted || decrypted}
+{:else if form?.decrypted || (data.content && $page.url.hash)}
   <hr class="mb-4 mt-1 dark:border-neutral-500" />
 
   <div class="prose prose-neutral max-w-none dark:prose-invert">
-    {@html md.render(form?.decrypted || decrypted || '')}
+    {#if form?.decrypted}
+      {@html md.render(form.decrypted)}
+    {:else if data.content}
+      {#await decryptNote(data.content, $page.url.hash) then content}
+        {@html md.render(content)}
+      {/await}
+    {/if}
   </div>
 {:else}
   <noscript>
     <form action="?/decrypt" method="post">
-      <input type="hidden" name="content" value={data.content} />
       <p class="mb-4">
-        JavaScript is currently inactive. To access the content of the note, kindly decrypt it by pasting the
-        current URL into the space provided below. Please be aware that this action will reveal the note's
-        contents to the server.
+        JavaScript is currently inactive. To access the content of the note, paste the current URL into the
+        input below. Please be aware that this action will reveal the note's contents to the server.
+
+        {#if data.destroyAfterRead}
+          The note will be destroyed after you read it.
+        {/if}
       </p>
+
       <div class="flex flex-col md:flex-row flex-wrap md:flex-nowrap gap-2">
         <input type="text" class="input flex-1" name="url" placeholder="URL" />
         <button class="btn primary">Decrypt</button>

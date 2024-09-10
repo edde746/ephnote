@@ -2,14 +2,14 @@
   import { Icon } from '@steeze-ui/svelte-icon';
   import { Clipboard, Check } from '@steeze-ui/lucide-icons';
   import { applyAction, enhance } from '$app/forms';
-  import type { ActionData } from './$types';
+  import type { ActionData, PageData } from './$types';
   import { page } from '$app/stores';
-  import crypto from 'crypto-js';
-  import Base64 from 'crypto-js/enc-base64';
+  import { browser } from '$app/environment';
 
   let encryptionKey = '';
   let justCopied = false;
 
+  export let data: PageData;
   export let form: ActionData;
 </script>
 
@@ -31,33 +31,46 @@
       type="text"
       value={url}
       readonly
-      class="w-full dark:text-neutral-400 text-neutral-700 bg-transparent focus:outline-none border border-r-0 border-colors px-3 py-2 rounded-lg rounded-r-none"
+      class="w-full dark:text-neutral-400 text-neutral-700 bg-transparent focus:outline-none border border-colors px-3 py-2 rounded-lg"
+      class:rounded-r-none={browser}
+      class:border-r-0={browser}
     />
-    <button
-      type="button"
-      on:click={() => {
-        navigator.clipboard.writeText(url);
-        justCopied = true;
-        setTimeout(() => (justCopied = false), 2000);
-      }}
-      class="btn border w-max border-lime-700 dark:border-lime-600 dark:bg-lime-700 bg-lime-500 hover:brightness-105 rounded-lg rounded-l-none"
-    >
-      <Icon src={justCopied ? Check : Clipboard} class="w-6 h-6" />
-    </button>
+    {#if browser}
+      <button
+        type="button"
+        on:click={() => {
+          navigator.clipboard.writeText(url);
+          justCopied = true;
+          setTimeout(() => (justCopied = false), 2000);
+        }}
+        class="btn border w-max border-lime-700 dark:border-lime-600 dark:bg-lime-700 bg-lime-500 hover:brightness-105 rounded-lg rounded-l-none"
+      >
+        <Icon src={justCopied ? Check : Clipboard} class="w-6 h-6" />
+      </button>
+    {/if}
   </div>
 
   <a class="btn primary w-full block text-center" href="/"> Create Another </a>
 {:else}
   <form
     method="post"
-    use:enhance={({ formData }) => {
+    enctype="multipart/form-data"
+    use:enhance={async ({ formData }) => {
       const content = formData.get('content');
       if (!content || content.length === 0 || typeof content !== 'string') return;
 
-      encryptionKey = Base64.stringify(crypto.lib.WordArray.random(32));
-      const encrypted = crypto.AES.encrypt(content, encryptionKey).toString();
-      formData.set('content', encrypted);
-      formData.set('encrypted', 'true');
+      const key = crypto.getRandomValues(new Uint8Array(32 + 16));
+      const encrypted = await crypto.subtle.encrypt(
+        {
+          name: 'AES-CBC',
+          iv: key.slice(0, 16)
+        },
+        await crypto.subtle.importKey('raw', key.slice(16), 'AES-CBC', false, ['encrypt']),
+        new TextEncoder().encode(content)
+      );
+
+      formData.set('content', new Blob([encrypted]));
+      encryptionKey = btoa(String.fromCharCode(...key));
 
       return ({ result }) => {
         applyAction(result);
@@ -75,7 +88,7 @@
       rows="10"
       class="w-full input mb-2"
       placeholder="Write your message here (with markdown support)..."
-      maxlength={1024 * 16}
+      maxlength={data.maxContentLength - 1}
     />
     <div class="flex flex-wrap md:justify-between items-center gap-2">
       <label>

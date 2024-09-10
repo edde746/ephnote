@@ -1,9 +1,12 @@
-import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import crypto from 'crypto-js';
-import Base64 from 'crypto-js/enc-base64';
+import { error } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 import { createId } from '@paralleldrive/cuid2';
 import redis from '$lib/server/redis';
+import { maxContentLength, maxDays } from '$lib/server/config';
+import msgpack from "@msgpack/msgpack";
+import { encryptNote } from '$lib';
+
+export const load: PageServerLoad = () => ({ maxContentLength });
 
 export const actions: Actions = {
   default: async ({ request }) => {
@@ -14,31 +17,32 @@ export const actions: Actions = {
     const destroyAfterRead = body.has('read');
 
     if (
-      !content?.length ||
-      typeof content !== 'string' ||
-      content.length > 1024 * 32 ||
+      !content ||
+      (content instanceof File ? content.size > maxContentLength : content.length > maxContentLength) ||
       !destroyAfterDays ||
-      destroyAfterDays > 30
+      destroyAfterDays > maxDays
     )
-      return fail(400, { message: 'Invalid request' });
+      return error(400, { message: 'Invalid request' });
 
-    const alreadyEncryped = body.has('encrypted');
-    let key: string | undefined;
-    if (!alreadyEncryped) {
-      key = Base64.stringify(crypto.lib.WordArray.random(32));
-      content = crypto.AES.encrypt(content, key).toString();
+    let key, data;
+    if (content instanceof File) {
+      data = await content.arrayBuffer();
+    } else {
+      const note = await encryptNote(content);
+      key = note.key;
+      data = note.encrypted;
     }
 
     let id = createId();
 
     await redis.set(
       `note:${id}`,
-      JSON.stringify({
-        content,
+      Buffer.from(msgpack.encode({
+        content: new Uint8Array(data),
         destroyAfterDays,
         destroyAfterRead,
         created: Date.now()
-      }),
+      })),
       'EX',
       destroyAfterDays * 24 * 60 * 60
     );

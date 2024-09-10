@@ -1,10 +1,11 @@
 import redis from '$lib/server/redis';
 import type { Actions, PageServerLoad } from './$types';
-import { error, fail } from '@sveltejs/kit';
-import crypto from 'crypto-js';
+import { error } from '@sveltejs/kit';
+import msgpack from "@msgpack/msgpack";
+import { decryptNote } from '$lib';
 
 type Note = {
-  content: string;
+  content: Buffer;
   destroyAfterDays: number;
   destroyAfterRead: boolean;
   created: number;
@@ -12,35 +13,40 @@ type Note = {
 
 export const load: PageServerLoad = async ({ params, url, request }) => {
   if (request.method === 'POST') return;
+  const key = `note:${params.note}`;
 
-  const note = (await redis.get(`note:${params.note}`).then((note) => {
-    if (!note) return null;
-    return JSON.parse(note);
-  })) as Note | null;
-
-  if (!note) throw error(404, 'Note not found');
+  const note = (await redis.getBuffer(key).then((note) => {
+    if (!note) error(404, 'Note not found');
+    return msgpack.decode(note);
+  })) as Note;
 
   if (note.destroyAfterRead) {
-    if (url.searchParams.has('read')) await redis.del(`note:${params.note}`);
+    if (url.searchParams.has('read')) await redis.del(key);
     else return { destroyAfterRead: true };
   }
-  return { ...note };
+
+  return { ...note, content: note.content.toString('base64url') };
 };
 
 export const actions: Actions = {
-  decrypt: async ({ request }) => {
+  decrypt: async ({ request, params }) => {
     const body = await request.formData();
 
-    const content = body.get('content')?.toString();
     const url = body.get('url')?.toString();
-    if (!content || !url) return fail(400, { message: 'Invalid request' });
+    if (!url) error(400, 'Invalid request');
 
     const key = url.split('#').pop();
-    if (!key) return fail(400, { message: 'Invalid URL' });
+    if (!key) error(400, 'Invalid URL');
 
-    const decrypted = crypto.AES.decrypt(content, key).toString(crypto.enc.Utf8);
-    if (!decrypted) return fail(400, { message: 'Invalid key' });
+    const note = (await redis.getBuffer(`note:${params.note}`).then((note) => {
+      if (!note) error(404, 'Note not found');
+      return msgpack.decode(note) as Note;
+    }).then(async (note) => ({
+      ...note, content: await decryptNote(note.content, key)
+    })));
 
-    return { decrypted };
+    if (note.destroyAfterRead) await redis.del(`note:${params.note}`);
+
+    return { decrypted: note.content };
   }
 };
