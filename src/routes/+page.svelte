@@ -107,4 +107,8 @@
   label {
     @apply flex items-center gap-2 text-sm;
   }
+
+  option {
+    @apply bg-neutral-950 text-neutral-50;
+  }
 </style>
