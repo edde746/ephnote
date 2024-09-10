@@ -31,3 +31,18 @@ For hosting, some viable options are [Vercel](https://vercel.com/) and [Cloudfla
 ### Environment Variables
 
 The only environment variable required is `REDIS_URL`, which should be set to the connection string of your Redis instance.
+
+## Docker
+
+Example `docker-compose.yml`:
+```yaml
+services:
+  ephnote:
+    image: ghcr.io/edde746/ephnote:latest
+    ports:
+      - 3000:3000
+    environment:
+      - REDIS_URL=redis://redis:6379
+  redis:
+    image: redis:alpine
+```
